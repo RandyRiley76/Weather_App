@@ -1,0 +1,100 @@
+<html>
+<head>
+  <link href="https://fonts.googleapis.com/css?family=Libre+Baskerville" rel="stylesheet">
+  <style>
+  #container{
+    width: 350px;
+    margin: auto;
+    font-family: 'Libre Baskerville', serif;
+    background-color: #deeff5;
+    border-radius: 25px;
+    border: 8px solid #1d6b85;
+    padding: 25px;
+    text-align: center;
+  }
+  body{
+    background-color: #ADD8E6;
+  }
+  h1{
+    padding: 10px;
+    margin: 0px;
+  }
+  img{
+    height: 100px;
+    width: 100px;
+  }
+  #weatherIcon {
+    display: block;
+  }
+  a{
+    display: inline-block;
+    font-size: 1.5em;
+  }
+  #temp{
+    display: inline-block;
+  }
+ #loc{
+   padding-top: 25px;
+ }
+
+  </style>
+</head>
+<body>
+  <div id=container>
+<h1>Weather App</h1>
+<div id="weatherIcon"></div>
+<h1 id="temp"></h1>
+<a id="tempType" href="#" onclick="changeTemp();return false;"></a>
+<h3 id="description"></h3>
+<div id="wind"></div>
+<div id="loc">
+Your Location is Loading...
+</div>
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>
+function changeTemp(){
+  //alert("its working");
+  if ($("#tempType").html()=="F"){
+    $("#tempType").html("C");
+    $("#temp").html(cTemp);
+  }else{
+    $("#tempType").html("F");
+    $("#temp").html(fTemp);
+  }
+}
+
+$(document).ready(function(){
+
+  if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(function(position) {
+  //  $("#loc").html("Your Location is near  <br>latitude: " + position.coords.latitude + "<br>longitude: " + position.coords.longitude);
+     var lat=position.coords.latitude;
+     var long=position.coords.longitude;
+    $.getJSON("https://cors-anywhere.herokuapp.com/http://api.openweathermap.org/data/2.5/weather?lat="+lat+"&lon="+long+"&units=imperial&APPID=15792496565a26b57d1c127e703529cc", function(json) {
+    //  $("#data").html(JSON.stringify(json));
+      fTemp = json.main.temp;
+      cTemp = Math.round((fTemp - 32) * (5/9));
+      $("#temp").html(json.main.temp);
+
+      $("#tempType").html("F");
+      $("#weatherIcon").html("<img alt='Weather Icon' src='http://openweathermap.org/img/w/" + json.weather[0].icon +".png'>");
+      $("#description").html(json.weather[0].description);
+      $("#wind").html("The wind is "+json.wind.speed+" Miles/Hr")
+     $("#loc").html("Your Location is near " +json.name+ ", " +json.sys.country+" <br>latitude: " + lat + "<br>longitude: " + long);
+  //  $("#testLoc").html("Location Name " + json.name +", "+ json.sys.country);
+
+    });
+
+    });
+}else{
+  $("#loc").html("Your browser doesn't support showing your location");
+}
+
+
+});
+</script>
+</body>
+</html>
